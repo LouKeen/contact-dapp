@@ -45,8 +45,7 @@ contract Contact {
 
     function invite(address userToInvite) public userOnly {
         require(isUser(userToInvite));
-        User storage userToAdd = users[userToInvite];
-        userToAdd.requests.push(msg.sender);
+        users[userToInvite].requests.push(msg.sender);
     }
 
     function approve(uint requestToAccept) public userOnly {
@@ -57,11 +56,15 @@ contract Contact {
     }
 
     function decline(uint requestToDecline) public userOnly {
-        User storage user = users[msg.sender];
-        requestCleanUp(user.requests, requestToDecline);
+        requestCleanUp(users[msg.sender].requests, requestToDecline);
     }
 
-    // Query functions
+    function share(uint contactToShare, uint contactToReceive) public userOnly {
+        User storage user = users[msg.sender];
+        users[user.friends[contactToReceive]].friends.push(user.friends[contactToShare]);
+    }
+
+    // Query Functions
     function getRequests() public view returns (address[] memory) {
         return users[msg.sender].requests;
     }
@@ -75,6 +78,7 @@ contract Contact {
         return users[msg.sender].friends;
     }
 
+    // Utility Functions
     function isUser(address user) private view returns (bool) {
         return userIndex[users[user].index] == user;
     }
