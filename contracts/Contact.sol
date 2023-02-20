@@ -52,6 +52,7 @@ contract Contact {
         User storage user = users[msg.sender];
         address userToAccept = user.requests[requestToAccept];
         user.friends.push(userToAccept);
+        users[userToAccept].friends.push(msg.sender);
         requestCleanUp(user.requests, requestToAccept);
     }
 
@@ -60,8 +61,9 @@ contract Contact {
     }
 
     function share(uint contactToShare, uint contactToReceive) public userOnly {
+        require(contactToShare == contactToReceive);
         User storage user = users[msg.sender];
-        users[user.friends[contactToReceive]].friends.push(user.friends[contactToShare]);
+        users[user.friends[contactToShare]].requests.push(user.friends[contactToReceive]);
     }
 
     // Query Functions
